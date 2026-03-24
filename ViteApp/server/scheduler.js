@@ -1,46 +1,33 @@
 const cron = require('node-cron');
 const db = require('./database');
-const nodemailer = require('nodemailer');
-
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
-  auth: {
-    user: process.env.SMTP_EMAIL,
-    pass: process.env.SMTP_APP_PASSWORD,
-  },
-});
-
+const { sendMail } = require('./mailer');
 function daysBetween(d1, d2) {
   return Math.floor((new Date(d2) - new Date(d1)) / 86400000);
 }
 
 const sendReminder = async (user, reminder) => {
-  const mailOptions = {
-    from: process.env.SMTP_EMAIL,
-    to: user.email,
-    subject: `CycleSync Reminder: ${reminder.label} ${reminder.icon}`,
-    html: `
-      <div style="font-family: Arial, sans-serif; background: #fff0f3; padding: 40px 20px; text-align: center;">
-        <div style="background: white; max-width: 480px; margin: 0 auto; padding: 40px 24px; border-radius: 24px; box-shadow: 0 8px 24px rgba(232,121,160,0.15);">
-          <div style="font-size: 48px; margin-bottom: 12px;">${reminder.icon}</div>
-          <h1 style="color: #e879a0; margin: 0 0 8px; font-size: 26px;">CycleSync</h1>
-          <p style="color: #9b6b8a; font-size: 16px; margin: 0 auto 10px;">
-            Here is your requested gentle reminder:
-          </p>
-          <div style="background: #fdf2f8; padding: 24px; border-radius: 16px; display: inline-block; border: 2px solid #fce7f3; margin-top: 10px;">
-            <h2 style="margin: 0; font-size: 24px; color: #a855f7; font-weight: 700;">${reminder.label}</h2>
-          </div>
-          <p style="color: #d1b8c8; font-size: 13px; margin-top: 30px;">
-            You can manage these reminders anytime in your CycleSync App settings.
-          </p>
-        </div>
-      </div>
-    `,
-  };
   try {
-    await transporter.sendMail(mailOptions);
+    await sendMail({
+      to: user.email,
+      subject: `CycleSync Reminder: ${reminder.label} ${reminder.icon}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; background: #fff0f3; padding: 40px 20px; text-align: center;">
+          <div style="background: white; max-width: 480px; margin: 0 auto; padding: 40px 24px; border-radius: 24px; box-shadow: 0 8px 24px rgba(232,121,160,0.15);">
+            <div style="font-size: 48px; margin-bottom: 12px;">${reminder.icon}</div>
+            <h1 style="color: #e879a0; margin: 0 0 8px; font-size: 26px;">CycleSync</h1>
+            <p style="color: #9b6b8a; font-size: 16px; margin: 0 auto 10px;">
+              Here is your requested gentle reminder:
+            </p>
+            <div style="background: #fdf2f8; padding: 24px; border-radius: 16px; display: inline-block; border: 2px solid #fce7f3; margin-top: 10px;">
+              <h2 style="margin: 0; font-size: 24px; color: #a855f7; font-weight: 700;">${reminder.label}</h2>
+            </div>
+            <p style="color: #d1b8c8; font-size: 13px; margin-top: 30px;">
+              You can manage these reminders anytime in your CycleSync App settings.
+            </p>
+          </div>
+        </div>
+      `
+    });
     console.log(`[SCHEDULER] Reminder sent to ${user.email}: ${reminder.label}`);
   } catch (err) {
     console.error(`[SCHEDULER] Failed to send reminder to ${user.email}`, err);
