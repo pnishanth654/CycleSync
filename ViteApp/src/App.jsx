@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 
+const API_BASE = import.meta.env.VITE_API_URL || '';
+
 // ─── Persistent Storage Helpers ───────────────────────────────────────────────
 const DB = {
   get: async (key) => {
@@ -15,7 +17,7 @@ const DB = {
 // ─── Gemini AI Helper ─────────────────────────────────────────────────────────
 async function askClaude(prompt) {
   try {
-    const res = await fetch("/api/ai/suggestion", {
+    const res = await fetch(API_BASE + "/api/ai/suggestion", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt }),
@@ -91,7 +93,7 @@ function RegisterScreen({ onDone }) {
     const calculatedAge = Math.floor((new Date() - new Date(form.dob).getTime()) / 3.15576e+10);
     if (calculatedAge < 10 || calculatedAge > 60) { setErr("Age must be between 10–60 based on your DOB."); return; }
     try {
-      const res = await fetch("/api/auth/send-otp", {
+      const res = await fetch(API_BASE + "/api/auth/send-otp", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: form.email })
       });
@@ -104,7 +106,7 @@ function RegisterScreen({ onDone }) {
 
   const handleVerify = async () => {
     try {
-      const res = await fetch("/api/auth/register", {
+      const res = await fetch(API_BASE + "/api/auth/register", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...form, otp })
       });
@@ -202,7 +204,7 @@ function LoginScreen({ onDone, onRegister }) {
   const handleLogin = async () => {
     if (!email || !password) { setErr("Enter email and password"); return; }
     try {
-      const res = await fetch("/api/auth/login", {
+      const res = await fetch(API_BASE + "/api/auth/login", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password })
       });
@@ -218,7 +220,7 @@ function LoginScreen({ onDone, onRegister }) {
     if (!email) { setErr("Enter your email address first"); return; }
     try {
       setMsg("Sending reset code..."); setErr("");
-      const res = await fetch("/api/auth/forgot-password-otp", {
+      const res = await fetch(API_BASE + "/api/auth/forgot-password-otp", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email })
       });
@@ -232,7 +234,7 @@ function LoginScreen({ onDone, onRegister }) {
   const handleReset = async () => {
     if (!otp || !newPassword) { setErr("Enter OTP and new password"); return; }
     try {
-      const res = await fetch("/api/auth/reset-password", {
+      const res = await fetch(API_BASE + "/api/auth/reset-password", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp, newPassword })
       });
@@ -354,7 +356,7 @@ function LogScreen({ user, token, onSave }) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetch("/api/log/" + user.id + "/" + today, { headers: { "Authorization": `Bearer ${token}` } })
+    fetch(API_BASE + "/api/log/" + user.id + "/" + today, { headers: { "Authorization": `Bearer ${token}` } })
       .then(r => r.json())
       .then(d => { if (d) setEntry({ ...entry, ...d }); });
   }, []);
@@ -363,7 +365,7 @@ function LogScreen({ user, token, onSave }) {
 
   const handleSave = async () => {
     setLoading(true);
-    await fetch("/api/logs/" + user.id, {
+    await fetch(API_BASE + "/api/logs/" + user.id, {
       method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
       body: JSON.stringify(entry)
     });
@@ -490,7 +492,7 @@ function Dashboard({ user, token }) {
   }, []);
 
   const loadData = async () => {
-    const res = await fetch("/api/logs/" + user.id, { headers: { "Authorization": `Bearer ${token}` } });
+    const res = await fetch(API_BASE + "/api/logs/" + user.id, { headers: { "Authorization": `Bearer ${token}` } });
     const valid = await res.json();
     setLogs(valid);
 
@@ -610,7 +612,7 @@ function HistoryScreen({ user, token }) {
 
   useEffect(() => {
     async function load() {
-      const res = await fetch("/api/logs/" + user.id, { headers: { "Authorization": `Bearer ${token}` } });
+      const res = await fetch(API_BASE + "/api/logs/" + user.id, { headers: { "Authorization": `Bearer ${token}` } });
     const valid = await res.json();
     setLogs(valid);    }
     load();
@@ -689,7 +691,7 @@ function ProfileScreen({ user, token, onLogout }) {
 
   useEffect(() => {
     async function load() {
-      const res = await fetch("/api/logs/" + user.id, { headers: { "Authorization": `Bearer ${token}` } });
+      const res = await fetch(API_BASE + "/api/logs/" + user.id, { headers: { "Authorization": `Bearer ${token}` } });
     const entries = await res.json();
     setLogs(entries);    }
     load();
@@ -776,14 +778,14 @@ function RemindersScreen({ user, token }) {
   ];
 
   useEffect(() => {
-    fetch("/api/reminders/" + user.id, { headers: { "Authorization": `Bearer ${token}` } })
+    fetch(API_BASE + "/api/reminders/" + user.id, { headers: { "Authorization": `Bearer ${token}` } })
       .then(r => r.json())
       .then(d => {
         if (d && d.reminders) {
           setReminders(d.reminders);
         } else {
           setReminders(defaultReminders);
-          fetch("/api/reminders/" + user.id, {
+          fetch(API_BASE + "/api/reminders/" + user.id, {
             method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
             body: JSON.stringify({ reminders: defaultReminders })
           });
@@ -794,7 +796,7 @@ function RemindersScreen({ user, token }) {
   const toggle = (id) => {
     const updated = reminders.map(r => r.id === id ? { ...r, active: !r.active } : r);
     setReminders(updated);
-    fetch("/api/reminders/" + user.id, {
+    fetch(API_BASE + "/api/reminders/" + user.id, {
       method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
       body: JSON.stringify({ reminders: updated })
     });
@@ -905,3 +907,4 @@ export default function App() {
     </div>
   );
 }
+
