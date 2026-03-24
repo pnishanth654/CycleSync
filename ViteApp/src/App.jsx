@@ -130,7 +130,7 @@ function RegisterScreen({ onDone }) {
         {msg && <div style={S.successBox}>{msg}</div>}
         <div style={{ ...S.section, marginTop: 16 }}>
           <label style={S.label}>Enter OTP</label>
-          <input style={{ ...S.input, textAlign: "center", fontSize: 24, letterSpacing: 8, fontWeight: 700 }} value={otp} onChange={e => setOtp(e.target.value)} maxLength={6} placeholder="● ● ● ● ● ●" />
+          <input style={{ ...S.input, textAlign: "center", fontSize: 24, letterSpacing: 8, fontWeight: 700 }} value={otp} onChange={e => setOtp(e.target.value)} maxLength={6} placeholder="- - - - - -" />
         </div>
         {err && <div style={S.errorBox}>{err}</div>}
         <button style={{ ...S.btn, ...S.btnPrimary, width: "100%", marginTop: 16 }} onClick={handleVerify}>Verify & Create Account</button>
@@ -269,7 +269,7 @@ function LoginScreen({ onDone, onRegister }) {
         {msg && <div style={S.successBox}>{msg}</div>}
         <div style={S.section}>
           <label style={S.label}>Reset OTP</label>
-          <input style={{ ...S.input, textAlign: "center", fontSize: 24, letterSpacing: 8, fontWeight: 700 }} value={otp} onChange={e => setOtp(e.target.value)} maxLength={6} placeholder="● ● ● ● ● ●" />
+          <input style={{ ...S.input, textAlign: "center", fontSize: 24, letterSpacing: 8, fontWeight: 700 }} value={otp} onChange={e => setOtp(e.target.value)} maxLength={6} placeholder="- - - - - -" />
         </div>
         <div style={S.section}>
           <label style={S.label}>New Password</label>
