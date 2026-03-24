@@ -25,6 +25,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// ─── HEALTHCHECK ROUTE (For Vercel Keep-Awake Pinger) ──────────────────────
+app.get('/', (req, res) => {
+  res.status(200).send('CycleSync Backend is alive and evaluating schedules! 🌸');
+});
+
 const PORT = process.env.PORT || 3000;
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
