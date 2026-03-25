@@ -54,9 +54,9 @@ function convertQuery(sql) {
     return `INSERT INTO logs (id, user_id, date, flowLevel, painLevel, moodLevel, symptoms, notes, bloodColor, clotting, energyLevel, discharge, saved_at) 
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
             ON CONFLICT (id) DO UPDATE SET 
-            "flowLevel"=EXCLUDED."flowLevel", "painLevel"=EXCLUDED."painLevel", "moodLevel"=EXCLUDED."moodLevel", 
-            symptoms=EXCLUDED.symptoms, notes=EXCLUDED.notes, "bloodColor"=EXCLUDED."bloodColor", 
-            clotting=EXCLUDED.clotting, "energyLevel"=EXCLUDED."energyLevel", discharge=EXCLUDED.discharge, 
+            flowlevel=EXCLUDED.flowlevel, painlevel=EXCLUDED.painlevel, moodlevel=EXCLUDED.moodlevel, 
+            symptoms=EXCLUDED.symptoms, notes=EXCLUDED.notes, bloodcolor=EXCLUDED.bloodcolor, 
+            clotting=EXCLUDED.clotting, energylevel=EXCLUDED.energylevel, discharge=EXCLUDED.discharge, 
             saved_at=EXCLUDED.saved_at`;
   }
   let i = 1;

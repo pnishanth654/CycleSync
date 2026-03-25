@@ -183,7 +183,15 @@ app.post('/api/auth/reset-password', async (req, res) => {
 app.get('/api/logs/:userId', authenticateToken, (req, res) => {
   db.all(`SELECT * FROM logs WHERE user_id = ? ORDER BY date ASC`, [req.params.userId], (err, rows) => {
     if (err) return res.status(500).json({ error: 'DB Error' });
-    const formatted = rows.map(r => ({ ...r, symptoms: JSON.parse(r.symptoms || '[]') }));
+    const formatted = rows.map(r => ({
+      ...r,
+      flowLevel: r.flowLevel ?? r.flowlevel,
+      painLevel: r.painLevel ?? r.painlevel,
+      moodLevel: r.moodLevel ?? r.moodlevel,
+      bloodColor: r.bloodColor ?? r.bloodcolor,
+      energyLevel: r.energyLevel ?? r.energylevel,
+      symptoms: JSON.parse(r.symptoms || '[]')
+    }));
     res.json(formatted);
   });
 });
@@ -191,7 +199,15 @@ app.get('/api/logs/:userId', authenticateToken, (req, res) => {
 app.get('/api/log/:userId/:date', authenticateToken, (req, res) => {
   db.get(`SELECT * FROM logs WHERE user_id = ? AND date = ?`, [req.params.userId, req.params.date], (err, row) => {
     if (err || !row) return res.json(null);
-    res.json({ ...row, symptoms: JSON.parse(row.symptoms || '[]') });
+    res.json({
+      ...row,
+      flowLevel: row.flowLevel ?? row.flowlevel,
+      painLevel: row.painLevel ?? row.painlevel,
+      moodLevel: row.moodLevel ?? row.moodlevel,
+      bloodColor: row.bloodColor ?? row.bloodcolor,
+      energyLevel: row.energyLevel ?? row.energylevel,
+      symptoms: JSON.parse(row.symptoms || '[]')
+    });
   });
 });
 
